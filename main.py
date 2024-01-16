@@ -5,10 +5,10 @@ import random
 # How to execute: python3 main.py
 
 # Randomly colors nodes
-# on each iterations there are 4 steps:
-# 1) broadcast the permanent colors
-# 2) randomly select color out of pool, that none of the neighbours have (in the previous iteration)
-# 3) check if a neighbour has the same color as the node if so add to reset_v
+# on each iteration has 4 steps:
+# 1) broadcast the permanent colors to neighbors
+# 2) randomly select color out of pool, that none of the neighbors have (possible colors without permanent colors)
+# 3) check if a neighbor has the same color as the node if so add to reset_v
 # 4) resets colors if same color in the same iteration
 def coloring_function(V, E, max_degree):
     permanent_C = np.zeros(V, dtype=int)
@@ -16,7 +16,7 @@ def coloring_function(V, E, max_degree):
     counter = 0
     possible_value = np.empty(V, dtype=set)
 
-    # For each vertex generate a set of all possible colors, that none of the neighbours has
+    # For each vertex generate a set of all possible colors, that none of the neighbors has
     for i in range(V):
         possible_value[i] = set(range(1, max_degree + 2))
 
@@ -28,12 +28,12 @@ def coloring_function(V, E, max_degree):
             for u in u_list:
                 possible_value[u].discard(v)
 
-        # Choose random color that none of the neighbours had in the previous iterations
+        # Choose random color that none of the neighbors had in the previous iterations
         for v in range(0, V):
             if not permanent_C[v]:
                 CL[v] = random.choice(list(possible_value[v]))
 
-        # Compare color with neighbours
+        # Compare color with neighbors
         reset_v = set()
         for v, u_list in enumerate(E):
             if not permanent_C[v]:
@@ -54,7 +54,7 @@ def coloring_function(V, E, max_degree):
     return permanent_C
 
 
-# Checks if two neighbouring nodes have same color (share the same edge)
+# Checks if two neighboring nodes have same color (share the same edge)
 def check_coloring(E, C, max_degree):
     for v, u_list in enumerate(E):
         assert (C[v] <= max_degree + 1)
@@ -63,7 +63,7 @@ def check_coloring(E, C, max_degree):
     print("Test was successful\n")
 
 
-# Dynamically generates random Testcases and checks coloring
+# Dynamically generates random test cases and checks coloring
 def generate_test_cases():
     for i in range(1, 100, 10):
         # max possible degree in this iteration
@@ -74,7 +74,7 @@ def generate_test_cases():
         # Nr. of vertices
         vertices = random.randint(possible_max_degree + 1, (possible_max_degree + 1) ** 2)
 
-        #sets up edge datastructure
+        #sets up edge data structure
         edges = np.empty(vertices, dtype=set)
         for j in range(0, vertices):
             edges[j] = set()
@@ -99,14 +99,14 @@ def generate_test_cases():
                 vertex_counter[v] += 1
                 edge_counter += 1
 
-        # the maximum generate edge degree previously generated
+        # find the maximum degree of the generated vertices
         max_degree = max(vertex_counter)
         print("Max Degree: " + str(max_degree) + " | Vertices: " + str(vertices))
         print("Graph has in total: " + str(edge_counter) + " edges.")
         # Coloring
         C = coloring_function(vertices, edges, max_degree)
 
-        # Check if coloring is correct
+        # Check if the coloring is correct
         check_coloring(edges, C, max_degree)
 
 if __name__ == '__main__':
